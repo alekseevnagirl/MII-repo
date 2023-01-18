@@ -1,174 +1,173 @@
 import csv
+import random
 import numpy as np
 import pandas as pnd
-import random as rand
 import matplotlib.pyplot as plt
-from pathlib import Path
-from datetime import datetime
 from spisok import *
 
-def people(path: Path) -> None:
-    summa_strock: int = rand.randint(1000, 2000)
-    
-    with open(path, 'w', encoding='utf-16', newline='') as file:
-        titles = [
-            'Табельный номер',
-            'Фамилия И.О.',
-            'Пол',
-            'Год рождения',
-            'Год начала работы в компании',
-            'Подразделение',
-            'Должность',
-            'Оклад',
-            'Количество выполненных проектов'
-        ]
+
+def methodNumpy(dataset) -> None:
+    print("\nNumpy:\n")
+    data1: list[int] = []
+    data2: list[int] = []
+    zarplata: list[int] = []
+    for row in dataset:
+        data1.append(int(row[3]))
+        data2.append(int(row[4]))
+        zarplata.append(int(row[7]))
         
-        file_writer = csv.DictWriter(file, fieldnames=titles)
-        file_writer.writeheader()
-        
-        for i in range(1, summa_strock + 1):
-            choice_gender: str = rand.choice(gender)
+    print("Год рождения сотрудников:")    
+    print(data1)
+    print("Минимальный: ", np.min(data1))
+    print("Максимальный: ", np.max(data1))
+    print("Средний: ", np.mean(data1, dtype="int"))
+    print("Дисперсия: ", np.var(data1))
+    print("Стандартное отклонение:", np.std(data1))
+    print("Медиана:", np.median(data1))
+    print("\n")
+
+    print("Год начала работы в компании:")        
+    print(data2)
+    print("Минимальный: ", np.min(data2))
+    print("Максимальный: ", np.max(data2))
+    print("Средний: ", np.mean(data2, dtype="int"))
+    print("Дисперсия: ", np.var(data2))
+    print("Стандартное отклонение:", np.std(data2))
+    print("Медиана:", np.median(data2))
+    print("\n")
+
+    print("Зарплата сотрудников:")    
+    print(zarplata)
+    print("Минимальная: ", np.min(zarplata))
+    print("Максимальная: ", np.max(zarplata))
+    print("Средняя: ", np.mean(zarplata))
+    print("Дисперсия: ", np.var(zarplata))
+    print("Стандартное отклонение:", np.std(zarplata))
+    print("Медиана:", np.median(zarplata))
+    print("\n")
+
+    fig, (ax1, ax2, ax3) = plt.subplots(nrows = 1, ncols = 3, figsize=(14, 6))
+
+    count_years: list[int] = [0, 0, 0, 0, 0, 0, 0]
+    for row in data1:
+        if row < 1975:
+            count_years[0] = count_years[0] + 1
+        if (row >= 1975 and row < 1980):
+            count_years[1] = count_years[1] + 1
+        if (row >= 1980 and row < 1985):
+            count_years[2] = count_years[2] + 1
+        if (row >= 1985 and row < 1990):
+            count_years[3] = count_years[3] + 1
+        if (row >= 1990 and row < 1995):
+            count_years[4] = count_years[4] + 1
+        if (row >= 1995 and row < 2000):
+            count_years[5] = count_years[5] + 1
+        if (row >= 2000 and row < 2006):
+            count_years[6] = count_years[6] + 1
             
-            if choice_gender == 'Женский':
-                full_name = rand.choice(female_last_name) + ' ' + rand.choice(female_name) + ' ' + rand.choice(female_patronymic)
-            else:
-                full_name = rand.choice(male_last_name) + ' ' + rand.choice(male_name) + ' ' + rand.choice(male_patronymic)
-                
-            year_of_birth: int = rand.randint(1960, 2004)
-            year_of_start_working: int = year_of_birth + rand.randint(18, 30)
-            department: str = rand.choice(departments)
-            post: str = rand.choice(posts)
-            salary: int = rand.randint(20000, 200000)
-            kol_projects: int = rand.randint(1, 10)
+    ax1.step([1975, 1980, 1985, 1990, 1995, 2000, 2006],
+             count_years, color = "green")
+    ax1.set_title("Год рождения сотрудников")
+    
+    ax2.hist(data2, color = "orange")
+    ax2.set_title("Год начала работы в компании")
+
+    count: list[int] = [0, 0, 0, 0]
+    for row in zarplata:
+        if row < 100000:
+            count[0] = count[0] + 1
+        if (row >= 100000 and row < 150000):
+            count[1] = count[1] + 1
+        if (row >= 150000 and row < 250000):
+            count[2] = count[2] + 1
+        if (row >= 250000 and row < 300000):
+            count[3] = count[3] + 1
             
-            file_writer.writerow({
-                'Табельный номер': i,
-                'Фамилия И.О.': full_name,
-                'Пол': choice_gender,
-                'Год рождения': year_of_birth,
-                'Год начала работы в компании': year_of_start_working,
-                'Подразделение': department,
-                'Должность': post,
-                'Оклад': salary,
-                'Количество выполненных проектов': kol_projects
-            })
+    title = "20k - 100k", "100k - 150k", "150k - 250k", "250k - 300k"
+    explode = (0.1, 0, 0, 0)
+    ax3.pie(count, explode, labels = title)
+    ax3.set_title("Зарплата сотрудников")
+    plt.show()
+    
+def methodPandas(dataset) -> None:
+    print("\nPandas:\n")
+    print("Год рождения сотрудников:")
+    print("Минимальный: ", dataset["Год рождения"].min())
+    print("Максимальный: ", dataset["Год рождения"].max())
+    print("Средний: ", dataset["Год рождения"].mean().astype("int64"))
+    print("Дисперсия: ", dataset["Год рождения"].var())
+    print("Стандартное отклонение:", dataset["Год рождения"].std())
+    print("Медиана:", dataset["Год рождения"].median())
+    print("\n")
 
-def statistics_lists(path: Path) -> None:
-    with open(path, 'r', encoding='utf-16') as file:
-        kol_projects: list[int] = []
-        salaries: list[int] = []
-        years_of_birth: list[int] = []
-        years_of_start_working: list[int] = []
-        departments: list[str] = []
+    print("Год начала работы в компании:")        
+    print("Минимальный: ", dataset["Год начала работы в компании"].min())
+    print("Максимальный: ", dataset["Год начала работы в компании"].max())
+    print("Средний: ", dataset["Год начала работы в компании"].mean().astype("int64"))
+    print("Дисперсия: ", dataset["Год начала работы в компании"].var())
+    print("Стандартное отклонение:", dataset["Год начала работы в компании"].std())
+    print("Медиана:", dataset["Год начала работы в компании"].median())
+    print("\n")
 
-        file_reader = csv.DictReader(file)
-        for line in file_reader:
-            kol_projects.append(int(line['Количество выполненных проектов']))
-            salaries.append(int(line['Оклад']))
-            years_of_birth.append(int(line['Год рождения']))
-            years_of_start_working.append(int(line['Год начала работы в компании']))
-            departments.append(line['Подразделение'])
+    print("Зарплата сотрудников:")    
+    print("Минимальная: ", dataset["Оклад"].min())
+    print("Максимальная: ", dataset["Оклад"].max())
+    print("Средняя: ", dataset["Оклад"].mean().astype("int64"))
+    print("Дисперсия: ", dataset["Оклад"].var())
+    print("Стандартное отклонение:", dataset["Оклад"].std())
+    print("Медиана:", dataset["Оклад"].median())
+    print("\n")
+    
 
-        work_experiencies: list[int] = [datetime.now().year - years_of_start_working[i] for i in range(len(years_of_birth))]
-
-        print('Numpy')
-        print('')
-        print(f'Количество сотрудников: {np.count_nonzero(work_experiencies)}')
-        print('')
-        print('')
+with open("file.csv", mode="w", encoding='utf-16') as file:
+    file_writer = csv.writer(file, delimiter=",", lineterminator="\r")
+    file_writer.writerow(["Табельный номер", "Фамилия И.О.", "Пол", 
+			"Год рождения", "Год начала работы в компании",
+			"Подразделение", "Должность", "Оклад",
+			"Количество выполненных проектов"])
+    
+    kol_iter = random.randint(1001, 3000)
+    print("Количество строк:")
+    print(kol_iter)
+    i = 0
+    for line in range(1, kol_iter):
+        i = i + 1
+        tabel_number = i
         
-        print('Опыт работы')
-        print('')
-        print(f'Минимальный стаж: {np.min(work_experiencies)}')
-        print(f'Максимальный стаж: {np.max(work_experiencies)}')
-        print(f'Средний стаж: {round(np.average(work_experiencies), 2)}')
-        print('')
-        print('')
+        gend = random.choice(gender)
+        if gender == "Мужской":
+            name = random.choice(male_last_name)+" "+random.choice(male_name)+" "+random.choice(male_patronymic)
+        else:
+            name = random.choice(female_last_name)+" "+random.choice(female_name)+" "+random.choice(female_patronymic)
 
-        print('Заработная плата')
-        print('')
-        print(f'Минимальная зарплата, в рублях: {np.min(salaries)}')
-        print(f'Максимальная зарплата, в рублях: {np.max(salaries)}')
-        print(f'Средняя зарплата, в рублях: {round(np.average(salaries), 2)}')
-        print(f'Медианное значение зарплаты, в рублях: {np.median(salaries)}')
-        print(f'Дисперсия зарплаты, в рублях: {round(np.var(salaries), 2)}')
-        print(f'Стандартное отклонение зарплаты, в рублях: {round(np.std(salaries), 2)}')
-        print('')
-        print('')
+        date_of_birth = random.randint(1970, 2005)
+        start_work = date_of_birth + 18
+        date_work = random.randint(start_work, 2023)
+
+        depart = random.choice(departments)
+        post = random.choice(posts)
+        salary = random.randint(20000, 300000)
+        projects = (2023 - date_work + 1) * 2
+        file_writer.writerow([i, name, gend, date_of_birth, date_work,
+                              depart, post, salary, projects])
+
+
+dataset_DataFrame = pnd.read_csv("file.csv", encoding='utf-16', delimiter=",", lineterminator="\r")
+print("Сгенерированный набор данных:")
+print(dataset_DataFrame)
+
+with open("file.csv", encoding='utf-16') as dataset_Spisok:
+    file_reader = csv.reader(dataset_Spisok)
+    for row in file_reader:
+        methodNumpy(file_reader)
+    
+methodPandas(dataset_DataFrame)
         
-        print('Проекты')
-        print('')
-        print(f'Максимальное количество проектов на одного сотрудника: {np.max(kol_projects)}')
-        print(f'Минимальное количество проектов на одного сотрудника: {np.min(kol_projects)}')
-        print(f'Среднее количество проектов на одного сотрудника: {round(np.average(kol_projects), 2)}')
-        print(f'Количество выполненных проектов: {np.sum(kol_projects)}')
-        print('')
-        print('')
-
-def statistics_pnd(path: Path) -> None:
-    company = pnd.read_csv(path, encoding='utf-16')
     
-    print('Pandas')
-    print('')
-    print(f'Количество сотрудников: {company["Табельный номер"].count()}')
-    print('')
-    print('')
     
-    print('Проекты')
-    print('')
-    print(f'Максимальное количество проектов на одного сотрудника: {company["Количество выполненных проектов"].max()}')
-    print(f'Минимальное количество проектов на одного сотрудника: {company["Количество выполненных проектов"].min()}')
-    print(f'Среднее количество проектов на одного сотрудника: {round(company["Количество выполненных проектов"].sum() / company["Табельный номер"].count(), 2)}')
-    print(f'Количество выполненных проектов: {company["Количество выполненных проектов"].sum()}')
-    print('')
-    print('')
+
     
-    print('Зарплата')
-    print('')
-    print(f'Максимальная зарплата, в рублях: {company["Оклад"].max()}')
-    print(f'Минимальная зарплата, в рублях: {company["Оклад"].min()}')
-    print(f'Средняя зарплата, в рублях: {round(company["Оклад"].sum() / company["Оклад"].count(), 2)}')
-    print(f'Медианное значение зарплаты, в рублях: {company["Оклад"].median()}')
-    print(f'Дисперсия зарплаты, в рублях: {round(company["Оклад"].var(), 2)}')
-    print(f'Стандартное отклонение зарплаты, в рублях: {round(company["Оклад"].std(), 2)}')
-    print('')
-    print('')
-    
-    print('Отделы')
-    print('')
-    print(f'Количество отделов: {len(np.unique(departments))}')
-    print(f'Количество сотрудников в отделе Java разработки: {len(company[company["Подразделение"] == "Отдел Java разработки"])}')
-    print(f'Количество сотрудников в отделе Python разработки: {len(company[company["Подразделение"] == "Отдел Python разработки"])}')
-    print(f'Количество сотрудников в отделе Frontend разработки: {len(company[company["Подразделение"] == "Отдел frontend разработки"])}')
-    print(f'Количество сотрудников в отделе PHP разработки: {len(company[company["Подразделение"] == "Отдел PHP разработки"])}')
-    print('')
-    print('')
-
-def graphic_statistics(path: Path) -> None:
-    company = pnd.read_csv(path, encoding='utf-16')
-    projects_statistics = {}
-    jobs = company['Должность'].unique()
-
-    for item in jobs:
-        subdiv_employees = company[company['Должность'] == item]
-        projects_statistics[item] = round(subdiv_employees['Всего проектов'].sum() / subdiv_employees['Всего проектов'].count(), 2)
-
-    plt.plot(company["Оклад"], label='Оклад')
-    plt.axhline(y=np.nanmean(company['Оклад'].mean()), color='red', linestyle='--', linewidth=2, label='Mean')
-    plt.title('Динамика зарплаты и среднее значение зарплаты', loc='center')
-    plt.show()
-
-    plt.bar(projects_statistics.keys(), projects_statistics.values())
-    plt.title('Количество выполненных проектов по должностям', loc='center')
-    plt.show()
-
-    plt.hist(company['Подразделение'], bins=15)
-    plt.title('Количесство сотрудников по отделам', loc='center')
-    plt.show()
 
 
-file_path = Path(Path.cwd(), 'file.csv')
-people(file_path)
-statistics_lists(file_path)
-statistics_pnd(file_path)
-graphic_statistics(file_path)
+
+
